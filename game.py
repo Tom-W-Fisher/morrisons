@@ -11,6 +11,9 @@ class Board:
 
 		# I'll going to be bad and say
 
+#	def playerconfig(self, player1='r', player2='b'):
+#		self.players = [player1,player2]
+
 	def display(self):
 		return f'''{self.places[0][0]} - - {self.places[0][1]} - - {self.places[0][2]}
 | {self.places[1][0]} - {self.places[1][1]} - {self.places[1][2]} |
@@ -19,6 +22,14 @@ class Board:
 | | {self.places[2][6]} {self.places[2][5]} {self.places[2][4]} | |
 | {self.places[1][6]} - {self.places[1][5]} - {self.places[1][4]} |
 {self.places[0][6]} - - {self.places[0][5]} - - {self.places[0][4]}'''
+	
+	def place(self, ring, notch, player):
+		self.places[ring][notch] = player
+	
+	def move(self, oldring, oldnotch, newring, newnotch):
+		player = self.places[oldring][oldnotch]
+		self.places[oldring][oldnotch] = 0
+		self.places[newring][newnotch] = player
 
 
 class piece:
