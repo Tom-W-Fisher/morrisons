@@ -14,7 +14,7 @@ class Board:
 #	def playerconfig(self, player1='r', player2='b'):
 #		self.players = [player1,player2]
 
-	def display(self):
+	def __str__(self):
 		return f'''{self.places[0][0]} - - {self.places[0][1]} - - {self.places[0][2]}
 | {self.places[1][0]} - {self.places[1][1]} - {self.places[1][2]} |
 | | {self.places[2][0]} {self.places[2][1]} {self.places[2][2]} | |
@@ -23,10 +23,12 @@ class Board:
 | {self.places[1][6]} - {self.places[1][5]} - {self.places[1][4]} |
 {self.places[0][6]} - - {self.places[0][5]} - - {self.places[0][4]}'''
 	
-	def place(self, ring, notch, player):
+	def place(self, ring: int, notch: int, player: int) -> None:
+		"""Updates the value of places[ring][notch] to the value `player`"""
 		self.places[ring][notch] = player
 	
-	def move(self, oldring, oldnotch, newring, newnotch):
+	def move(self, oldring: int, oldnotch: int, newring: int, newnotch: int) -> None:
+		"""Checks if the move is valid, then moves piece from old position to new position"""
 		player = self.places[oldring][oldnotch]
 		self.places[oldring][oldnotch] = 0
 		self.places[newring][newnotch] = player
