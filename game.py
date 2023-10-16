@@ -12,16 +12,13 @@ class Board:
 		# I'll going to be bad and say
 
 	def display(self):
-		text = (
-		f"{self.places[0][0]} - - {self.places[0][1]} - - {self.places[0][2]}\n"
-		f"| {self.places[1][0]} - {self.places[1][1]} - {self.places[1][2]} |\n"
-		f"| | {self.places[2][0]} {self.places[2][1]} {self.places[2][2]} | |\n"
-		f"{self.places[0][7]} {self.places[1][7]} {self.places[2][7]}    {self.places[0][3]} {self.places[1][3]} {self.places[2][3]}\n"
-		f"| | {self.places[2][6]} {self.places[2][5]} {self.places[2][4]} | |\n"
-		f"| {self.places[1][6]} - {self.places[1][5]} - {self.places[1][4]} |\n"
-		f"{self.places[0][6]} - - {self.places[0][5]} - - {self.places[0][4]}\n"
-		)
-		return text
+		return f'''{self.places[0][0]} - - {self.places[0][1]} - - {self.places[0][2]}
+| {self.places[1][0]} - {self.places[1][1]} - {self.places[1][2]} |
+| | {self.places[2][0]} {self.places[2][1]} {self.places[2][2]} | |
+{self.places[0][7]} {self.places[1][7]} {self.places[2][7]}   {self.places[0][3]} {self.places[1][3]} {self.places[2][3]}
+| | {self.places[2][6]} {self.places[2][5]} {self.places[2][4]} | |
+| {self.places[1][6]} - {self.places[1][5]} - {self.places[1][4]} |
+{self.places[0][6]} - - {self.places[0][5]} - - {self.places[0][4]}'''
 
 
 class piece:
