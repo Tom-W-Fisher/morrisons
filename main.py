@@ -45,5 +45,5 @@ async def on_message(message):
 
 #----------------------------------------------------------------------------------------------------
 
-with open(token.txt,'r') as TOKEN:
+with open('token.txt','r') as TOKEN:
 	client.run(TOKEN)
