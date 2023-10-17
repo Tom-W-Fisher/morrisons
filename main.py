@@ -19,8 +19,22 @@ async def on_message(message):
 
 	if command[0] == 'help':
 		await message.channel.send('''idk lol pester dillon''')
+	
+	elif command[0] == 'start':
+		player1 = message.author
+		player2 = command[1] # TODO: see if this can be done by @ing
+		print(f'd: player1 = {player1}')
+		print(f'd: player2 = {player2}')
+		# setup board
+	
+	elif command[0] == 'place':
+		if message.author == player1:
+			pass # use game.add where you put in 1
+		elif message.author == player2:
+			pass # use game.add where you put in 2
 
-	elif command[0] == 'class':
+
+	elif command[0] == 'show':
 		await message.channel.send('http://dnd5e.wikidot.com/spells:'+command[1])
 
 	else: await message.channel.send(f'{command} command not recognised')
