@@ -50,6 +50,12 @@ class Board:
 				return False
 		return True
 
+	def check_if_in_mill(self, ring, notch):
+		pass
+		#if notch even
+			# check along both edges of that ring if there's three
+		#elif notch odd
+			# check along edge of ring but also the line that cuts thru rings
 
 class piece:
 	def __init__(self):
