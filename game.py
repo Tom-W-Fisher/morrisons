@@ -66,5 +66,5 @@ class piece:
 	def __init__(self):
 		pass
 
-b = Board()
-print(b.display())
+#b = Board()
+#print(b)
