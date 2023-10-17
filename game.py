@@ -30,6 +30,23 @@ class Board:
 		player = self.places[oldring][oldnotch]
 		self.places[oldring][oldnotch] = 0
 		self.places[newring][newnotch] = player
+	
+	def checkvalidmove(self, oldring, oldnotch, newring, newnotch):
+		# check on board
+		if not(newring in [0,1,2] and newnotch in [0,1,2,3,4,5,6,7]):
+			return False
+		# check is empty
+		if self.places[newring][newnotch] != 0:
+			return False
+		# checks for same ring
+		if newring == oldring:
+			if newnotch != (oldnotch+1)%8 and newnotch != (oldnotch-1)%8:
+				return False
+		# checks for changing ring
+		if oldnotch%2 == 1 and oldnotch == newnotch:
+			if newring != oldring+1 and newring != oldring-1:
+				return False
+		return True
 
 
 class piece:
