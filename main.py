@@ -4,7 +4,11 @@ import game
 
 #----------------------------------------------------------------------------------------------------
 
-client = discord.Client()
+
+intents = discord.Intents.default() #idk what these two lines do but the docs say you need them now
+intents.message_content = True
+
+client = discord.Client(intents=intents)
 
 @client.event
 async def on_ready():
