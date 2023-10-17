@@ -23,7 +23,7 @@ class Board:
 | {self.places[1][6]} - {self.places[1][5]} - {self.places[1][4]} |
 {self.places[0][6]} - - {self.places[0][5]} - - {self.places[0][4]}'''
 	
-	def place(self, ring: int, notch: int, player: int) -> None:
+	def add(self, ring: int, notch: int, player: int) -> None: # changed from "pieces" to disambiguate
 		"""Updates the value of places[ring][notch] to the value `player`"""
 		self.places[ring][notch] = player
 	
@@ -52,10 +52,15 @@ class Board:
 
 	def check_if_in_mill(self, ring, notch):
 		pass
-		#if notch even
+		# if notch even
+		if notch%2 == 0:
 			# check along both edges of that ring if there's three
-		#elif notch odd
+			if self.places[ring][(notch-1)%8] == self.places[ring][notch] and self.places[ring][(notch+1)%8] == self.places[ring][notch]:
+				return True
+		# elif notch odd
+		elif notch%2 == 1:
 			# check along edge of ring but also the line that cuts thru rings
+			pass
 
 class piece:
 	def __init__(self):
