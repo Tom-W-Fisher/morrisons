@@ -19,7 +19,7 @@ async def on_ready():
 async def on_message(message):
 	if message.author == client.user: return # if it's the bot's message
 	if message.content[0:1] !='.m': return
-	command = message.content[2:].split()
+	command = message.content[3:].split()
 
 	if command[0] == 'help':
 		await message.channel.send('''idk lol pester dillon''')
