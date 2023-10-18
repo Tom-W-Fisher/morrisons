@@ -30,8 +30,8 @@ class Board:
 			self.places[1][6], self.places[1][5], self.places[1][4],
 			self.places[0][6], self.places[0][5], self.places[0][4])
 	
-	def place(self, ring: int, notch: int, player: int) -> None:
-		"""Assigns the value `player` to the designated place"""
+	def add(self, ring: int, notch: int, player: int) -> None: # changed from "pieces" to disambiguate
+		"""Updates the value of places[ring][notch] to the value `player`"""
 		self.places[ring][notch] = player
 	
 	def move(self, old_ring: int, old_notch: int, new_ring: int, new_notch: int) -> bool:
@@ -62,16 +62,25 @@ Returns a True/False depending on whether the move was successful"""
 				return False
 		return True
 	
+	def mill_formed(self, ring: int, notch: int) -> bool: # changed to "mill_formed" for conciseness, can change back if preferred
+		# if notch even
+		if notch % 2 == 0:
+			# check along both edges of that ring if there's three
+			# i split the if statement over 2 lines
+			if self.places[ring][(notch-1)%8] == self.places[ring][notch] \
+		   and self.places[ring][(notch+1)%8] == self.places[ring][notch]:
+				return True
+		# elif notch odd
+		elif notch%2 == 1:
+			# check along edge of ring but also the line that cuts thru rings
+			pass
+
 	def turn(self, move: Move):
 		"""Handles the logic for 1 turn. Does not check whos turn it is"""
 		if move.is_valid():
 			move.apply(self.places)
-			if self.forms_mill(move.new_ring, move.new_notch):
+			if self.mill_formed(move.new_ring, move.new_notch):
 				self.do_mill_stuff()
-
-	def forms_mill(self, ring: int, notch: int) -> bool:
-		"""Checks if the piece at the given position is part of a mill"""
-		pass
 
 	def do_mill_stuff():
 		"""Does mill stuff"""
@@ -148,4 +157,4 @@ class Relocate(Move):
 
 
 b = Board()
-print(str(b))
+print(b.display())
