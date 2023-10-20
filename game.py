@@ -15,22 +15,22 @@ Attributes:
 - `_current_player` \n
 	An integer storing the index of the current player in `players`.
 	This is not meant to be read from externally. Use method
-	`get_current_player` to get the token of the current player.
+	`get_current_player` to get the num of the current player.
 """
-	def __init__(self, player_1_token: int, player_2_token: int):
+	def __init__(self, player_1_num: int, player_2_num: int):
 		# three rings, 8 places each
 		self.places = [	[0,0,0,0,0,0,0,0],
 				 		[0,0,0,0,0,0,0,0],
 						[0,0,0,0,0,0,0,0]]
 
-		self.players = [Player(player_1_token), Player(player_2_token)]
+		self.players = [Player(player_1_num), Player(player_2_num)]
 		self._current_player: int = 0
 
 # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 		
 	def get_current_player(self) -> int:
-		"""Returns the token of the current player"""
-		return self._get_current_player_object().token
+		"""Returns the num of the current player"""
+		return self._get_current_player_object().num
 
 	def _get_current_player_object(self) -> Player:
 		"""Returns the player whos turn it is"""
@@ -111,12 +111,12 @@ Attributes:
 
 class Player:
 	"""Stores some information about a player."""
-	def __init__(self, token: int):
-		"""`token` is the number that will be \
+	def __init__(self, num: int):
+		"""`num` is the number that will be \
 		used to represent the player's pieces when the board is converted to \
 		a string."""
-		self.token = token
-		# "token" just refers to the arbitrary number for the player
+		self.num = num
+		# "num" just refers to the arbitrary number for the player
 		self.men_unplayed = 9
 		self.men_locations = []
 		self.mill_turn = False
@@ -144,7 +144,7 @@ current board state."""
 	
 	def apply(self, places: list[list[int]]):
 		self._check_validity()
-		places[self.new_ring][self.new_notch] = self.player.token
+		places[self.new_ring][self.new_notch] = self.player.num
 		self.player.men_locations.append([self.new_ring, self.new_notch])
 
 # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -158,7 +158,7 @@ class Remove(Move):
 		self.board = board
 
 	def _check_validity(self, places: list[list[int]]):
-		if places[self.new_ring][self.new_notch] != self.affected_player.token:
+		if places[self.new_ring][self.new_notch] != self.affected_player.num:
 			raise ValueError("Target place needs to be occupied by enemy man")
 		
 		all_mills = True
@@ -201,7 +201,7 @@ class Relocate(Move):
 
 	def _check_validity(self, places: list[list[int]]):
 		super()._check_validity(places)
-		if places[self.old_ring][self.old_notch] != self.player.token:
+		if places[self.old_ring][self.old_notch] != self.player.num:
 			raise ValueError("Initial place is not occupied by the moving \
 player's man.")
 		# `convert_to_move` only creates a `Relocate` object if the player has 3 men
