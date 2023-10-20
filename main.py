@@ -1,6 +1,7 @@
 from tdlib import log
 import discord
 import game
+debug = True
 
 #----------------------------------------------------------------------------------------------------
 
@@ -13,11 +14,11 @@ client = discord.Client(intents=intents)
 @client.event
 async def on_ready():
 	print(f'{client.user} has connected to Discord!')
-	log(f'{client.user} has connected to Discord!')
+	#log(f'{client.user} has connected to Discord!')
 
 @client.event
 async def on_message(message):
-	print('seen message!')
+	if debug: print('seen message!')
 	if message.author == client.user: return # if it's the bot's message
 	if message.content[0] !='.': return
 	command = message.content[1:].split()
@@ -28,8 +29,8 @@ async def on_message(message):
 	elif command[0] == 'start':
 		player1 = message.author
 		player2 = command[1] # TODO: see if this can be done by @ing
-		print(f'd: player1 = {player1}')
-		print(f'd: player2 = {player2}')
+		if debug: print(f'd: player1 = {player1}')
+		if debug: print(f'd: player2 = {player2}')
 		# setup board
 	
 	elif command[0] == 'place':
