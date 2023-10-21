@@ -49,6 +49,8 @@ Attributes:
 	def mill_formed(self, ring: int, notch: int) -> bool:
 		"""Checks if the place specified by the given ring and notch is a \
 			part of a mill."""
+		if self.places[ring][notch] == 0:
+			return False
 		# if notch even
 		if notch % 2 == 0:
 			# check along both edges of that ring if there's three
@@ -78,6 +80,11 @@ Attributes:
 		"""Handles the logic for 1 turn. Does not check whos turn it is.
 		Will raise errors (of type `ValueError`) with messages if input is not
 		formatted correctly or is not a legal move."""
+		if self._get_current_player_object().men_in_play < 3 \
+		and self._get_current_player_object().men_unplayed < 1:
+			self.change_current_player()
+			raise WinError(f"Player {self.get_current_player()} has won!")
+
 		move = convert_to_move(
 			player_input,
 			self._get_current_player_object(),
@@ -87,6 +94,11 @@ Attributes:
 			move.player.mill_turn = True
 		else:
 			self.change_current_player()
+			if self._get_current_player_object().men_in_play < 3 \
+			and self._get_current_player_object().men_unplayed < 1:
+				self.change_current_player()
+				raise WinError(f"Player {self.get_current_player()} has won!")
+
 
 	
 	def __str__(self):
@@ -102,11 +114,16 @@ Attributes:
 			self.places[1][0], self.places[1][1], self.places[1][2],
 			self.places[2][0], self.places[2][1], self.places[2][2], 
 			self.places[0][7], self.places[1][7], self.places[2][7], 
-				self.places[0][3], self.places[1][3], self.places[2][3],
+				self.places[2][3], self.places[1][3], self.places[0][3],
 			self.places[2][6], self.places[2][5], self.places[2][4], 
 			self.places[1][6], self.places[1][5], self.places[1][4],
 			self.places[0][6], self.places[0][5], self.places[0][4])
-	
+
+# ----------------------------------------------------------------------------
+
+class WinError(Exception):
+	pass
+
 # ----------------------------------------------------------------------------
 
 class Player:
@@ -117,7 +134,7 @@ class Player:
 		a string."""
 		self.num = num
 		# "num" just refers to the arbitrary number for the player
-		self.men_unplayed = 9
+		self.men_unplayed = 4
 		self.men_locations = []
 		self.mill_turn = False
 
@@ -143,9 +160,9 @@ current board state."""
 			raise ValueError("Destination place needs to be empty.")
 	
 	def apply(self, places: list[list[int]]):
-		self._check_validity()
+		self._check_validity(places)
 		places[self.new_ring][self.new_notch] = self.player.num
-		self.player.men_locations.append([self.new_ring, self.new_notch])
+		self.player.men_locations.append((self.new_ring, self.new_notch))
 
 # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
@@ -172,10 +189,9 @@ class Remove(Move):
 all enemy men are in mills.")
 			
 	def apply(self, places: list[list[int]]):
-		self._check_validity()
+		self._check_validity(places)
 		places[self.new_ring][self.new_notch] = 0
-		self.affected_player.men_locations.remove(
-											[self.new_ring, self.new_notch])
+		self.affected_player.men_locations.remove((self.new_ring, self.new_notch))
 		self.player.mill_turn = False
 		
 # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -184,6 +200,9 @@ class Place(Move):
 	"""Describes a move type where a piece is placed on to the board"""
 	def _check_validity(self, places: list[list[int]]):
 		super()._check_validity(places)
+		if self.player.men_unplayed < 1:
+			raise ValueError("Can't place a man because all men have been \
+placed.")
 	
 	def apply(self, places):
 		super().apply(places)
@@ -195,25 +214,28 @@ class Relocate(Move):
 	"""Describes a move type where a piece is moved from one space to any\
  other space"""
 	def __init__(self, player, new_ring, new_notch, old_ring, old_notch):
-		super().__init__(self, player, new_ring, new_notch)
+		super().__init__(player, new_ring, new_notch)
 		self.old_ring = old_ring
 		self.old_notch = old_notch
 
 	def _check_validity(self, places: list[list[int]]):
-		super()._check_validity(places)
+		if self.player.men_unplayed > 0:
+			raise ValueError("Can't move a man because not all men have been \
+placed.")
 		if places[self.old_ring][self.old_notch] != self.player.num:
 			raise ValueError("Initial place is not occupied by the moving \
 player's man.")
+		super()._check_validity(places)
+		
 		# `convert_to_move` only creates a `Relocate` object if the player has 3 men
 		# so checking number of men is not required
 		# which allows `Shift` to inherit without creating problems
 
-	def apply(self, places):
-		super().apply()
+	def apply(self, places: list[list[int]]):
+		super().apply(places)
 		places[self.old_ring][self.old_notch] = 0
 
-		self.player.men_locations.append(([self.new_ring][self.new_notch]))
-		self.player.men_locations.remove(([self.old_ring][self.old_notch]))
+		self.player.men_locations.remove((self.old_ring, self.old_notch))
 
 # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
@@ -221,7 +243,7 @@ class Shift(Relocate):
 	"""Describes a move where a piece is moved from one space to an adjacent \
 	space"""
 	def __init__(self, player, new_ring, new_notch, old_ring, old_notch):
-		super().__init__(self, player, new_ring, new_notch, old_ring, old_notch)
+		super().__init__(player, new_ring, new_notch, old_ring, old_notch)
 
 	def _check_validity(self, places: list[list[int]]):
 		super()._check_validity(places)
@@ -259,22 +281,28 @@ def convert_to_move(text_input: str, player: Player, board: Board) -> Move:
 long: {word} was given at index {index}, which is of length {len(word)}")
 		
 		if not word[0].isalpha():
-			raise ValueError("Expected first character to be a letter. \
+			raise ValueError(f"Expected first character to be a letter. \
 {word[0]} was recieved.")
 		
 		word = word.upper().split(",")
-		text_input[index] = word
+		if len(word) == 1:
+			word = word[0]
 
 		if word[0] not in ("A", "B", "C"):
-			raise ValueError("Expected first character to be either \
+			raise ValueError(f"Expected first character to be either \
 A, B, or C. {word[0]} was recieved")
 
 		if not word[1].isdigit():
-			raise ValueError("Expected second character to be a digit.\
-{word[1]} was recieved.")
+			raise ValueError(f"Expected second character to be a digit. \
+'{word[1]}' was recieved.")
+		
+		word = [word[0], int(word[1])]
 		if word[1] < 0 or word[1] > 7:
 			raise ValueError(f"Expected second digit to be in range 0:7 \
 inclusive. Value of {word[0]} was recieved.")
+		
+		
+		text_input[index] = word
 
 	if len(text_input) == 1:
 		if not player.mill_turn:
@@ -292,6 +320,22 @@ inclusive. Value of {word[0]} was recieved.")
 
 # ----------------------------------------------------------------------------
 
+def terminal_test():
+	"""Test the game from terminal."""
+	b = Board(1, 2)
+	try:
+		while True:
+			print(str(b))
+			print(f"Player {b.get_current_player()}")
+			if b._get_current_player_object().mill_turn:
+				print("Select piece to remove")
+			else:
+				print("Enter move")
+			try:
+				b.take_turn(input())
+			except ValueError as error_message:
+				print(error_message)
+	except WinError as win_message:
+		print(win_message)
 
-b = Board(1, 2)
-print(str(b))
+terminal_test()
